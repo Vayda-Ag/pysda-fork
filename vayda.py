@@ -1,7 +1,7 @@
 from matplotlib import pyplot
 import sdapoly, sdaprop
 
-shape_file_path = "/Users/arahav/Downloads/MSHUB_Boundaries.shp"
+shape_file_path = "C:/Users/gabri/Desktop/Vayda/data/MSHUB/Fall 2022/Fields/boundaries.shp"
 aoi = sdapoly.shp(shape_file_path)
 
 SSURGO_CLASSES = {
@@ -122,7 +122,7 @@ data=sdaprop.getprop(
     prnt=False,
     meta=True
 )
-
+print(data)
 
 # ValueError: Unknown aggregation method. Specify one of the following: 'wtd_avg','dom_comp_cat','dom_comp_num','dom_cond','minmax','muaggatt'
 
@@ -176,17 +176,17 @@ handles, labels = ax.get_legend_handles_labels()
 print(handles, labels)
 
 pyplot.savefig(
-    f"/Users/arahav/Downloads/ssurgo_data/{key_name}.svg",
+    f"C:/Users/gabri/Desktop/Vayda/data/MVP/Regen Ag Plan 1.0/SUURGO/MSHUB/{key_name}.svg",
     format="svg",
     bbox_inches="tight"
 )
 
 pyplot.savefig(
-    f"/Users/arahav/Downloads/ssurgo_data/{key_name}.png",
+    f"C:/Users/gabri/Desktop/Vayda/data/MVP/Regen Ag Plan 1.0/SUURGO/MSHUB/{key_name}.png",
     bbox_inches="tight"
 )
 
 merged_data.to_file(
-    filename=f"/Users/arahav/Downloads/ssurgo_data/{key_name}.gpkg",
+    filename=f"C:/Users/gabri/Desktop/Vayda/data/MVP/Regen Ag Plan 1.0/SUURGO/MSHUB/{key_name}.gpkg",
     driver="GPKG"
 )
