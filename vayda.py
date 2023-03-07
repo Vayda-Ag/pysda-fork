@@ -160,14 +160,10 @@ merged_data.plot(
 
 # add a legend
 leg = ax.get_legend()
-# print(leg.properties())
-# print(dir(leg.legendHandles[0]))
 leg._set_loc(2)
 leg.set_frame_on(False)
 leg.set_bbox_to_anchor((0.5, 0.55))
 ax.set(title=ssurgo_class["title"])
-print(ax.legend().texts)
-ax.legend().update_from(leg)
 
 pyplot.axis("off")
 pyplot.axis("tight")
