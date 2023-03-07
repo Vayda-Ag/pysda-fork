@@ -1,8 +1,13 @@
+from sdapoly import shp
+from sdaprop import getprop
 from matplotlib import pyplot
-import sdapoly, sdaprop
+from argparse import ArgumentParser
+from pathlib import Path
+from natsort import index_natsorted
+from numpy import argsort
 
-shape_file_path = "/Users/arahav/Downloads/MSHUB_Boundaries.shp"
-aoi = sdapoly.shp(shape_file_path)
+
+# python3 vayda.py --shape-file-path /Users/arahav/Downloads/MSHUB_Boundaries.shp --output-directory /Users/arahav/Downloads/ssurgo_data --ssurgo-class-name weg
 
 SSURGO_CLASSES = {
     "taxclname": {
@@ -97,9 +102,27 @@ SSURGO_CLASSES = {
     }
 }
 
-# TODO: wtdepannmin, wtdepaprjunmin, flodfreqdcd
-key_name = "cec7_r"
-ssurgo_class = SSURGO_CLASSES[key_name]
+parser = ArgumentParser()
+parser.add_argument(
+    "--shape-file-path",
+    help="The local path to the farm/field boundaries shapefile.",
+    required=True
+)
+parser.add_argument(
+    "--output-directory",
+    help="The directory where the data generated from ssurgo will be written to.",
+    required=True
+)
+parser.add_argument(
+    "--ssurgo-class-name",
+    help="The SSURGO class name to retrieve data for.",
+    default="taxclname",
+    choices=list(SSURGO_CLASSES.keys())
+)
+args = parser.parse_args()
+
+aoi = shp(args.shape_file_path)
+ssurgo_class = SSURGO_CLASSES[args.ssurgo_class_name]
 method = ssurgo_class["methods"][0]
 
 if method == "muaggatt":
@@ -107,11 +130,11 @@ if method == "muaggatt":
     bottom = None
     prop = None
 else:
-    top = 0 
+    top = 0
     bottom = 100
-    prop = key_name
+    prop = args.ssurgo_class_name
 
-data=sdaprop.getprop(
+data = getprop(
     df=aoi,
     column="mukey",
     method=method,
@@ -124,33 +147,27 @@ data=sdaprop.getprop(
 )
 
 
-# ValueError: Unknown aggregation method. Specify one of the following: 'wtd_avg','dom_comp_cat','dom_comp_num','dom_cond','minmax','muaggatt'
-
-from natsort import index_natsorted
-import numpy
+# ValueError: Unknown aggregation method. Specify one of the following: "wtd_avg","dom_comp_cat","dom_comp_num","dom_cond","minmax","muaggatt"
 
 # remove duplicate columns, join/merge the results, show first record
 aoi_cols = aoi.columns.tolist()
 data_cols = data.columns.tolist()
-drop_cols = [col for col in data_cols if col in aoi_cols and col != 'mukey']
-data.drop(columns = drop_cols, inplace = True)
-
-
-merged_data = aoi.merge(data, how = 'inner', on = 'mukey')
+drop_cols = [col for col in data_cols if col in aoi_cols and col != "mukey"]
+data.drop(columns=drop_cols, inplace=True)
+merged_data = aoi.merge(data, how="inner", on="mukey")
 
 merged_data = merged_data.sort_values(
-    by=key_name,
-    key=lambda x: numpy.argsort(index_natsorted(merged_data[key_name]))
+    by=args.ssurgo_class_name,
+    key=lambda x: argsort(index_natsorted(merged_data[args.ssurgo_class_name]))
 )
 merged_data.head(1)
-print(merged_data)
 
-# merged_data[key_name] = "(" + getattr(merged_data, key_name) + ")" + " " + merged_data.muname
-fig, ax = pyplot.subplots(1,1)
-fig.set_size_inches(6,6)
+# merged_data[args.ssurgo_class_name] = "(" + getattr(merged_data, args.ssurgo_class_name) + ")" + " " + merged_data.muname
+fig, ax = pyplot.subplots(1, 1)
+fig.set_size_inches(6, 6)
 
 merged_data.plot(
-    column=key_name,
+    column=args.ssurgo_class_name,
     ax=ax,
     cmap="rainbow",
     legend=True
@@ -168,21 +185,21 @@ ax.set(title=ssurgo_class["title"])
 pyplot.axis("off")
 pyplot.axis("tight")
 pyplot.axis("image")
-handles, labels = ax.get_legend_handles_labels()
-print(handles, labels)
+
+Path(args.output_directory).mkdir(exist_ok=True, parents=True)
 
 pyplot.savefig(
-    f"/Users/arahav/Downloads/ssurgo_data/{key_name}.svg",
+    f"{args.output_directory}/{args.ssurgo_class_name}.svg",
     format="svg",
     bbox_inches="tight"
 )
 
 pyplot.savefig(
-    f"/Users/arahav/Downloads/ssurgo_data/{key_name}.png",
+    f"{args.output_directory}/{args.ssurgo_class_name}.png",
     bbox_inches="tight"
 )
 
 merged_data.to_file(
-    filename=f"/Users/arahav/Downloads/ssurgo_data/{key_name}.gpkg",
+    filename=f"{args.output_directory}/{args.ssurgo_class_name}.gpkg",
     driver="GPKG"
 )
