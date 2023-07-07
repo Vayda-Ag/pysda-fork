@@ -26,6 +26,12 @@ SSURGO_CLASSES = {
         "type": "varchar",
         "title": "Drainage Classification"
     },
+    "flsoilleachpot": {
+        "methods": ["dom_comp_cat", "dom_cond"],
+        "name": "fl_soil_leaching_potential",
+        "type": "varchar",
+        "title": "Soil Erodibility Factor RF"
+    },
     "wtdepannmin": {
         "methods": ["muaggatt"],
         "name": "wtdepth_annual_min",
@@ -38,8 +44,8 @@ SSURGO_CLASSES = {
         "type": "integer",
         "title": "Water Table Depth April/June - Minimum (cm)"
     },
-    "dbovendry": {
-        "methods": ["muaggatt"],
+    "dbovendry_r": {
+        "methods": ["wtd_avg"],
         "name": "bulk_density_oven_dry",
         "type": "float",
         "title": "Bulk Density (g/cm3)"
@@ -175,26 +181,26 @@ for class_name, ssurgo_class in SSURGO_CLASSES.items():
     )
     merged_data.head(1)
 
-    fig, ax = pyplot.subplots(1, 1)
-    fig.set_size_inches(6, 6)
+    # fig, ax = pyplot.subplots(1, 1)
+    # fig.set_size_inches(6, 6)
 
-    merged_data.plot(
-        column=class_name,
-        ax=ax,
-        cmap="rainbow",
-        legend=True
-    )
+    # merged_data.plot(
+    #     column=class_name,
+    #     ax=ax,
+    #     cmap="rainbow",
+    #     legend=True
+    # )
 
     # Adjust the legend position and size
-    leg = ax.get_legend()
-    leg.set_frame_on(False)
-    leg.set_bbox_to_anchor((1.02, 1))
-    leg.set_title(ssurgo_class["title"])
-    leg.get_title().set_fontsize(10)
-    leg.get_title().set_fontweight('bold')
+    # leg = ax.get_legend()
+    # leg.set_frame_on(False)
+    # leg.set_bbox_to_anchor((1.02, 1))
+    # leg.set_title(ssurgo_class["title"])
+    # leg.get_title().set_fontsize(10)
+    # leg.get_title().set_fontweight('bold')
     
     # Set the figure title
-    ax.set(title=ssurgo_class["title"])
+    # ax.set(title=ssurgo_class["title"])
 
    # Create the output directory if it doesn't exist
     Path(args.output_directory).mkdir(exist_ok=True, parents=True)
