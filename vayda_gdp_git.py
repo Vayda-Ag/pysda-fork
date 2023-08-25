@@ -1,5 +1,6 @@
 from sdapoly import shp
 from sdaprop import getprop
+from matplotlib import pyplot
 from argparse import ArgumentParser
 from pathlib import Path
 from natsort import index_natsorted
@@ -138,12 +139,11 @@ if os.path.splitext(args.shape_file_path)[1].lower() == ".gpkg":
     # Convert GeoPackage to Shapefile
     output_shp = os.path.join(bound_dir, "all_fields.shp")
     data = gpd.read_file(args.shape_file_path)
-    data = data.drop(columns=['Name', 'description', 'begin', 'end', 'altitudeMode', 'tessellate', 'extrude', 'visibility', 'drawOrder', 'icon','timestamp'])
-    
     data.to_file(output_shp, driver="ESRI Shapefile")
     args.shape_file_path = output_shp  # Update the shape file path to the converted Shapefile
 
 aoi = shp(args.shape_file_path)
+
 
 for class_name, ssurgo_class in SSURGO_CLASSES.items():
     method = ssurgo_class["methods"][0]
@@ -203,7 +203,7 @@ for class_name, ssurgo_class in SSURGO_CLASSES.items():
     # ax.set(title=ssurgo_class["title"])
 
    # Create the output directory if it doesn't exist
-   # Path(args.output_directory).mkdir(exist_ok=True, parents=True)
+    Path(args.output_directory).mkdir(exist_ok=True, parents=True)
 
    # Save the figure as SVG and PNG
     # pyplot.savefig(
